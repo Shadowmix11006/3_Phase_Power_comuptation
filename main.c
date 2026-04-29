@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include "string.h"
 #include "File_open.h"
+#include "Computation.h"
 
 int main() {
     char filePath[256]; // defninf the maximum size of the string
     int x = 0;
+    int total_records = 0;
 
     do {
         x = 0;
@@ -19,7 +21,11 @@ int main() {
 
     } while (x == 0); // making a loop to confirm the file location
 
-    File_open(filePath); // calling the file open function
+    //Calli funtions to peform actions below
+    waveform_sample *log_ptr = File_open(filePath, &total_records); // calling the file open function
+
+    computation(&(log_ptr->phase_A_voltage), total_records);// computing diffrent metrics
+
 
     return 0;
 }

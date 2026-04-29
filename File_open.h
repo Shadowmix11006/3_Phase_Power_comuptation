@@ -1,5 +1,6 @@
 #include <stdio.h>
-#ifndef File_open
+#ifndef File_open_h
+    #define File_open_h
 
 //Defining what is inside the strut
 typedef struct
@@ -14,6 +15,6 @@ typedef struct
     double thd_percent;
 }waveform_sample;
 
-int File_open(char[256]);
+waveform_sample* File_open(char path[256], int *final_count);
 
 #endif
