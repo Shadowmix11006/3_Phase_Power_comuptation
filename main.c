@@ -8,6 +8,11 @@ int main() {
     int x = 0;
     int total_records = 0;
 
+    //file write
+    FILE *file;
+    file = fopen("results.txt", "w");
+    fprintf(file, "*** Result For Waveform in this File ***\n\n\n");
+
     do {
         x = 0;
         printf("Enter the file path to read csv log fie: \n");
@@ -24,7 +29,9 @@ int main() {
     //Calli funtions to peform actions below
     waveform_sample *log_ptr = File_open(filePath, &total_records); // calling the file open function
 
-    computation(&(log_ptr->phase_A_voltage), total_records);// computing diffrent metrics
+    computation(&(log_ptr->phase_A_voltage), total_records, file, 'A');// computing diffrent metrics phase A
+    computation(&(log_ptr->phase_B_voltage), total_records, file, 'B');// computing diffrent metrics Phase B
+    computation(&(log_ptr->phase_C_voltage), total_records, file, 'C');// computing diffrent metrics phase C
 
 
     return 0;

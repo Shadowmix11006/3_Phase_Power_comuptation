@@ -3,7 +3,7 @@
 #include "File_open.h"
 #include <stdio.h>
 
-void computation(double* ptr, int count)
+void computation(double* ptr, int count, FILE *file, char phase)
 {
     double Vrms = 0; // Vrms value
     double sum_sqr = 0; //for sum in funtions
@@ -21,7 +21,8 @@ void computation(double* ptr, int count)
     }
 
 
-    printf("computation started\n");//just put here to make sure it runs
+    printf("        computation started for phase %c\n", phase);//just put here to make sure it runs
+    fprintf(file,"        computation started for phase %c\n\n", phase);//just put here to make sure it runs
 
     //loop cycling through every value of strut
     for (int i = 0; i < count; i++ ){
@@ -51,21 +52,24 @@ void computation(double* ptr, int count)
     Vrms = sqrt(sum_sqr / (double)count);
     //checking tolarance compience below
     if (Vrms < 207 || Vrms > 253){
-        printf("WOW RMS of Phase A is outside complient range");
+        fprintf(file, "WOW RMS of Phase %c is outside complient range\n", phase);
     }
 
     //printing rms value
-    printf("Calculated RMS for:\n phase A : %lf\n", Vrms);// printing out the RMS of each phase
+    fprintf(file,"Calculated RMS : %lf\n", Vrms);// printing out the RMS of each phase
+
+    //peak voltage
+    fprintf(file, "Peak voltage : %lf\n", (Vrms*1.4142));
 
     //peak to peak fr each phase
     pp = (max-min);
-    printf("max and min are %lf & %lf\n", max, min);
-    printf("peak to peak value is : %lf\n", pp);
+    fprintf(file, "max and min are %lf & %lf\n", max, min);
+    fprintf(file, "peak to peak value is : %lf\n", pp);
 
     //DC offset computaion
     offset = ((1/(double)count) * sum);
-    printf("DC offset is : %lf\n", offset);
+    fprintf(file, "DC offset is : %lf\n", offset);
 
     //Clipped sample
-    printf("No of clipped ones : %d", clip);
+    fprintf(file, "No of clipped data points : %d\n", clip);
 };
