@@ -1,8 +1,8 @@
 #ifndef computation_h
     #define computation_h
 
-#include "File_open.h"
+#include "IO.h"
 
-void computation(double* ptr, int count, FILE *file, char phase);
+void computation(char* ptr, int count, int size, FILE *file, int *run_count, char phase);
 
 #endif //computation

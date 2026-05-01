@@ -1,9 +1,9 @@
-#include "File_open.h"
+#include "IO.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 // Opening a file location which has been taken from the user
-waveform_sample* File_open(char path[256], int *final_count)
+waveform_sample* IO(char path[256], int *final_count, FILE **file_out)
 {
     static int read = 0; // number of rows or lines read and put into strut
     static int N = 0; // line in file also total number of lines in file
@@ -11,7 +11,7 @@ waveform_sample* File_open(char path[256], int *final_count)
     int records = 0; // variable to update each row of array to strut
     char buff[256];// buffer charector
 
-    printf("File_open in progress\n");//just put here to make sure it funtion has run
+    printf("IO in progress\n");//just put here to make sure it funtion has run
     FILE *file;
     file = fopen(path, "r");
 
@@ -104,6 +104,10 @@ if (records < N){
 //        log[i].power_factor,
 //        log[i].thd_percent);
 
-
-    return log;
+    //file write
+    FILE *File_write;
+    File_write = fopen("results.txt", "w");
+    fprintf(File_write, "*** Result For Waveform in this File ***\n\n\n");
+    *file_out = File_write;
+    return (log);
 };

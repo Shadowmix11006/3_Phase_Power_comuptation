@@ -1,17 +1,14 @@
 #include <stdio.h>
 #include "string.h"
-#include "File_open.h"
+#include "IO.h"
 #include "Computation.h"
 
 int main() {
     char filePath[256]; // defninf the maximum size of the string
     int x = 0;
     int total_records = 0;
-
-    //file write
+    int count = 0;
     FILE *file;
-    file = fopen("results.txt", "w");
-    fprintf(file, "*** Result For Waveform in this File ***\n\n\n");
 
     do {
         x = 0;
@@ -27,12 +24,14 @@ int main() {
     } while (x == 0); // making a loop to confirm the file location
 
     //Calli funtions to peform actions below
-    waveform_sample *log_ptr = File_open(filePath, &total_records); // calling the file open function
+    waveform_sample *log_ptr = IO(filePath, &total_records, &file); // calling the file open function
+    int size = sizeof(waveform_sample);//calculating size to pass into computation
 
-    computation(&(log_ptr->phase_A_voltage), total_records, file, 'A');// computing diffrent metrics phase A
-    computation(&(log_ptr->phase_B_voltage), total_records, file, 'B');// computing diffrent metrics Phase B
-    computation(&(log_ptr->phase_C_voltage), total_records, file, 'C');// computing diffrent metrics phase C
-
+    //computation
+    computation(&(log_ptr->phase_A_voltage), total_records, size, file, &count, 'A');// computing diffrent metrics phase A
+    computation(&(log_ptr->phase_B_voltage), total_records, size, file, &count, 'B');// computing diffrent metrics Phase B
+    computation(&(log_ptr->phase_C_voltage), total_records, size, file, &count, 'C');// computing diffrent metrics phase C
+    printf("count : %d", count);
 
     return 0;
 }

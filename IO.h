@@ -1,6 +1,7 @@
 #include <stdio.h>
-#ifndef File_open_h
-    #define File_open_h
+#include "stdint.h"
+#ifndef IO_h
+    #define IO_h
 
 //Defining what is inside the strut
 typedef struct
@@ -13,8 +14,11 @@ typedef struct
     double frequency;
     double power_factor;
     double thd_percent;
+    uint8_t Health_A;
+    uint8_t Health_B;
+    uint8_t Health_C;
 }waveform_sample;
 
-waveform_sample* File_open(char path[256], int *final_count);
+waveform_sample* IO(char path[256], int *final_count, FILE **file_out);
 
 #endif
