@@ -3,18 +3,18 @@
 #include "IO.h"
 #include <stdio.h>
 
-void computation(char* ptr, int count, int size, FILE *file, int *run_count, char phase)
+void computation(char* ptr, uint8_t* health_ptr, int count, int size, FILE *file, int *run_count, char phase)
 {
     double Vrms = 0; // Vrms value
     double sum_sqr = 0; //for sum in funtions
     double sum = 0; // sum
-    double min = 0;
-    double max = 0;
+    double min = 0; // storing min
+    double max = 0; // stong max
     double pp = 0; // peak to peak value
     double offset = 0;// DC offset value
     int clip = 0; // numbre of clipped samples
-    double var_sum = 0;// sum of variance
     double var = 0;//variance
+    double mean = 0;// mean
 
     //error if no count read by file open
     if (ptr == NULL || count <= 0) {
@@ -23,35 +23,33 @@ void computation(char* ptr, int count, int size, FILE *file, int *run_count, cha
     }
 
 
-    printf("        computation started for phase %c\n", phase);//just put here to make sure it runs
-    fprintf(file,"        computation started for phase %c\n\n", phase);//just put here to make sure it runs
+    printf("computation started for phase %c....\n", phase);//just put here to make sure it runs
+    fprintf(file,"  computation started for phase %c\n\n", phase);//just put here to make sure it runs
 
     //loop cycling through every value of strut
     for (int i = 0; i < count; i++ ){
         //printf("phase A voltage?:%lf :", *(double)((char*)(ptr+(i*size))));//remove only for testing
+
+        double val = *(double*)((char*)(ptr+(i*size)));
         //summation of sqred values
-        char* ptr_update = ((char*)(ptr+(i*size)));
-        sum_sqr = (sum_sqr + *(double*)((char*)(ptr+(i*size))) * *(double*)((char*)(ptr+(i*size))) );
-        var_sum += *(double*)((char*)(ptr+(i*size)));
+        sum_sqr = (sum_sqr + val * val );
 
         //max min for peak-peak
-        if (min > *(double*)((char*)(ptr+(i*size)))){
-            min = *(double*)((char*)(ptr+(i*size)));
+        if (min > val){
+            min = val;
         }
-        if (max < *(double*)((char*)(ptr+(i*size)))){
-            max = *(double*)((char*)(ptr+(i*size)));
+        if (max < val){
+            max = val;
         }
 
         //DC offset sumation
-        sum += *(double*)((char*)(ptr+(i*size)));
-
+        sum += val;
+        //printf("clip? : %d\n", *((uint8_t*)((char*)health_ptr + (i * size))));
         //Clipping detection
-        if (*(double*)((char*)(ptr+(i*size))) > 324.9 || *(double*)((char*)(ptr+(i*size))) < -324.9){
+        if (val > 324.9 || val < -324.9){
             clip++;
-            *((uint8_t*)((char*)(ptr+(i*size)+(7-*run_count)*8+*run_count))) = ~*((uint8_t*)((char*)(ptr+(i*size)+(7-*run_count)*8+*run_count))) << 1;// bitwise flg fo clipping
-
+            *((uint8_t*)((char*)health_ptr + (i * size))) = (1 << 0); // Set Bit 0 for "Clipped"
         }
-
     }
 
     //final division for RMS calculation of each phase
@@ -63,6 +61,12 @@ void computation(char* ptr, int count, int size, FILE *file, int *run_count, cha
 
     //printing rms value
     fprintf(file,"Calculated RMS : %lf\n", Vrms);// printing out the RMS of each phase
+
+    //checking tolerence compliance
+    if (Vrms > 252 || Vrms < 208) {
+        fprintf(file, "Vrms out of 10% tolerance\n");
+    }
+
 
     //peak voltage
     fprintf(file, "Peak voltage : %lf\n", (Vrms*1.4142));
@@ -78,12 +82,19 @@ void computation(char* ptr, int count, int size, FILE *file, int *run_count, cha
 
     //Clipped sample
     fprintf(file, "No of clipped data points : %d\n", clip);
+    fprintf(file, "Clipped data below: \n");
 
+    //second loop for variance caluculation and also printing the clipped values based on te helth metric to demonstaste bitwise operation
+    mean = (sum / (double)count);
     for (int i = 0; i < count; i++ ){
-        var += *(double*)((char*)(ptr+(i*size))) - (var_sum/(double)count);
+        double val = *(double*)((char*)(ptr+(i*size)));
+        var += (val - mean) * (val - mean);
+        if (*((uint8_t *) ((char *) health_ptr + (i * size))) != 0 ){
+            fprintf(file, "%lf\n" , val);
+        }
     }
     var = var/((double)count-1);
-    fprintf(file, "Variance of the phase is : %lf", var);
+    fprintf(file, "Variance of the phase is : %lf\n", var);
     fprintf(file, "SD of phase is : %lf\n---------------------------\n\n", (sqrt(var)));
 
     *run_count += 1; // adds to the number of time the program has been run

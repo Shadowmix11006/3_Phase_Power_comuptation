@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 // Opening a file location which has been taken from the user
-waveform_sample* IO(char path[256], int *final_count, FILE **file_out)
+waveform_sample* IO(char path[256], int *final_count, FILE **file_out, char name[512])
 {
     static int read = 0; // number of rows or lines read and put into strut
     static int N = 0; // line in file also total number of lines in file
@@ -50,6 +50,10 @@ waveform_sample* IO(char path[256], int *final_count, FILE **file_out)
 
 do
 {
+    if (log[records].phase_A_voltage > 325 || log[records].phase_A_voltage < -325 || log[records].phase_B_voltage > 325 || log[records].phase_B_voltage < -325 || log[records].phase_C_voltage > 325 || log[records].phase_C_voltage < -325){
+        printf("Line %d skipped since one of the voltage values was above or belowe +- 325 and this is the sensor hard limit");
+        fgets(buff, sizeof(buff), file);
+    }
     //defining and reading each element from out csv file read should be 8 if every element of the line has been read
     read = fscanf(file,
                   "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n",
@@ -106,7 +110,7 @@ if (records < N){
 
     //file write
     FILE *File_write;
-    File_write = fopen("results.txt", "w");
+    File_write = fopen(name, "w");
     fprintf(File_write, "*** Result For Waveform in this File ***\n\n\n");
     *file_out = File_write;
     return (log);

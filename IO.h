@@ -19,6 +19,6 @@ typedef struct
     uint8_t Health_C;
 }waveform_sample;
 
-waveform_sample* IO(char path[256], int *final_count, FILE **file_out);
+waveform_sample* IO(char path[256], int *final_count, FILE **file_out, char name[512]);
 
 #endif
