@@ -28,9 +28,7 @@ void computation(char* ptr, uint8_t* health_ptr, int count, int size, FILE *file
 
     //loop cycling through every value of strut
     for (int i = 0; i < count; i++ ){
-        //printf("phase A voltage?:%lf :", *(double)((char*)(ptr+(i*size))));//remove only for testing
-
-        double val = *(double*)((char*)(ptr+(i*size)));
+        double val = *(double*)((char*)(ptr+(i*size)));//converts ugly pointer logic to one nice vaariable
         //summation of sqred values
         sum_sqr = (sum_sqr + val * val );
 
@@ -87,15 +85,15 @@ void computation(char* ptr, uint8_t* health_ptr, int count, int size, FILE *file
     //second loop for variance caluculation and also printing the clipped values based on te helth metric to demonstaste bitwise operation
     mean = (sum / (double)count);
     for (int i = 0; i < count; i++ ){
-        double val = *(double*)((char*)(ptr+(i*size)));
+        double val = *(double*)((char*)(ptr+(i*size))); // same ugly arable conversion
         var += (val - mean) * (val - mean);
-        if (*((uint8_t *) ((char *) health_ptr + (i * size))) != 0 ){
+        if (*((uint8_t *) ((char *) health_ptr + (i * size))) != 0 ){ //logic to print value based on bitise health
             fprintf(file, "%lf\n" , val);
         }
     }
     var = var/((double)count-1);
-    fprintf(file, "Variance of the phase is : %lf\n", var);
-    fprintf(file, "SD of phase is : %lf\n---------------------------\n\n", (sqrt(var)));
+    fprintf(file, "Variance of the phase is : %lf\n", var);//pritning variance
+    fprintf(file, "SD of phase is : %lf\n---------------------------\n\n", (sqrt(var)));//printing SD
 
     *run_count += 1; // adds to the number of time the program has been run
 

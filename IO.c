@@ -50,6 +50,7 @@ waveform_sample* IO(char path[256], int *final_count, FILE **file_out, char name
 
 do
 {
+    //anoyingly long VERY SIMPLE logic sorry
     if (log[records].phase_A_voltage > 325 || log[records].phase_A_voltage < -325 || log[records].phase_B_voltage > 325 || log[records].phase_B_voltage < -325 || log[records].phase_C_voltage > 325 || log[records].phase_C_voltage < -325){
         printf("Line %d skipped since one of the voltage values was above or belowe +- 325 and this is the sensor hard limit");
         fgets(buff, sizeof(buff), file);
